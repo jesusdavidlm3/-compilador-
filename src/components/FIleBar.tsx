@@ -1,77 +1,100 @@
+// FileBar.tsx
 import React, { useState } from 'react';
-import { Menu, message, Input } from 'antd';
+import { Menu, message, Dropdown, Modal, Input } from 'antd';
+import { Button } from 'antd';
 
-const FileBar: React.FC = () => {
-    const [fileName, setFileName] = useState(''); 
-    const [fileContent, setFileContent] = useState(''); 
+interface FileBarProps {
+    fileName: string; // Nombre del archivo
+    setFileName: React.Dispatch<React.SetStateAction<string>>;
+    fileContent: string; // Contenido del archivo
+    setFileContent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent }) => {
+    const [selectedKey, setSelectedKey] = useState<string | null>(null);
+    const [newFileName, setNewFileName] = useState<string>(fileName); // Estado para el nuevo nombre del archivo
 
     const handleOpen = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setFileContent(e.target?.result as string);
-                setFileName(file.name);
-                message.info(`Archivo abierto: ${file.name}`);
+                setFileContent(e.target?.result as string); // Establecer el contenido del archivo
+                setFileName(file.name); // Establecer el nombre del archivo
+                message.info(`Archivo abierto: ${file.name}`); // Mensaje de confirmación
             };
-            reader.readAsText(file);
+            reader.readAsText(file); // Leer el archivo como texto
         }
     };
 
     const handleSave = () => {
         if (!fileName) {
-            message.error('No hay un archivo para guardar.');
+            message.error('No hay un archivo para guardar.'); // Mensaje de error si no hay archivo
             return;
         }
         const blob = new Blob([fileContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName;
+        a.download = fileName; // Usar el nombre del archivo
         a.click();
         URL.revokeObjectURL(url);
-        message.info(`Archivo guardado: ${fileName}`);
+        message.info(`Archivo guardado: ${fileName}`); // Mensaje de confirmación
     };
 
     const handleSaveAs = () => {
-        const blob = new Blob([fileContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName || 'archivo.txt'; 
-        a.click();
-        URL.revokeObjectURL(url);
-        message.info(`Archivo guardado como: ${fileName || 'archivo.txt'}`);
+        // Mostrar un modal para que el usuario ingrese un nuevo nombre de archivo
+        Modal.confirm({
+            title: 'Guardar como',
+            content: (
+                <Input
+                    defaultValue={fileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                />
+            ),
+            onOk: () => {
+                const blob = new Blob([fileContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = newFileName || 'archivo.txt'; // Usar el nuevo nombre del archivo
+                a.click();
+                URL.revokeObjectURL(url);
+                message.info(`Archivo guardado como: ${newFileName || 'archivo.txt'}`); // Mensaje de confirmación
+            },
+        });
     };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFileName(e.target.value);
+    const handleMenuClick = (key: string) => {
+        setSelectedKey(key);
+        if (key === 'open') {
+            document.getElementById('fileInput')?.click();
+        } else if (key === 'save') {
+            handleSave();
+        } else if (key === 'saveAs') {
+            handleSaveAs();
+        }
     };
+
+    const menu = (
+        <Menu selectedKeys={[]} onClick={({ key }) => handleMenuClick(key)}>
+            <Menu.Item key="open">
+                <input type="file" onChange={handleOpen} style={{ display: 'none' }} id="fileInput" />
+                <label htmlFor="fileInput" style={{ cursor: 'pointer' }}>Abrir</label>
+            </Menu.Item>
+            <Menu.Item key="save">Guardar</Menu.Item>
+            <Menu.Item key="saveAs">Guardar como</Menu.Item>
+        </Menu>
+    );
 
     return (
-        <div>
-            <Menu mode="horizontal" className="FileBar">
-                <Menu.Item key="open">
-                    <input type="file" onChange={handleOpen} style={{ display: 'none' }} id="fileInput" />
-                    <label htmlFor="fileInput" style={{ cursor: 'pointer' }}>Abrir</label>
-                </Menu.Item>
-                <Menu.Item key="save" onClick={handleSave}>Guardar</Menu.Item>
-                <Menu.Item key="saveAs" onClick={handleSaveAs}>Guardar como</Menu.Item>
-                <Menu.Item key="name">
-                    <Input 
-                        placeholder="Nombre del archivo" 
-                        value={fileName} 
-                        onChange={handleNameChange} 
-                        style={{ width: 200 }} 
-                    />
-                </Menu.Item>
-            </Menu>
-            <textarea 
-                value={fileContent} 
-                onChange={(e) => setFileContent(e.target.value)} 
-                rows={10} 
-                style={{ width: '100%', marginTop: '20px' }} 
-            />
+        <div className="FileBar" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px' }}>
+            <Dropdown overlay={menu} trigger={['click']}>
+                <Button type="primary" style={{ marginRight: '20px', marginLeft:'30px' }}>Archivo</Button>
+            </Dropdown>
+            <span style={{ fontSize: '30px', marginLeft: '20px', flex: 1, textAlign: 'center' }}>
+                {fileName || 'Sin nombre'}
+            </span>
         </div>
     );
 }

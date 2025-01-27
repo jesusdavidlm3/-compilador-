@@ -24,14 +24,18 @@ body {
         padding: 0 20px; /* Espaciado horizontal */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para un efecto de profundidad */
     }
-
-    .FileBar .ant-menu-item {
-        color: white; /* Color del texto de los elementos del menú */
+    
+    .ant-dropdown-link {
+        color: white; /* Color del texto del menú */
+        font-size: 18px; /* Tamaño de fuente del menú */
     }
 
-    .FileBar .ant-menu-item:hover {
-        background-color: rgba(255, 255, 255, 0.1); /* Efecto hover */
+
+    .span {
+        color: white; /* Color del texto del nombre del archivo */
+        margin-left: 20px; /* Espaciado a la izquierda */
     }
+    
 
     .workArea {
         background-color: var(--bgColor);
@@ -56,6 +60,20 @@ body {
             height: 100%;
             background-color: var(--codeColor);
             border-radius: var(--moduleRadius);
+            display: flex; 
+            position: relative; 
+        
+            .editor-textarea {
+                width: 100%; 
+                height: 100%;
+                border: none; 
+                padding: 10px; 
+                font-family: monospace; 
+                resize: none;
+                outline: none;
+                background-color: transparent;
+                color: white;
+            }
         }
     }
 }
