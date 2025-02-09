@@ -1,49 +1,49 @@
-// FileBar.tsx
+
 import React, { useState } from 'react';
 import { Menu, message, Dropdown, Modal, Input } from 'antd';
 import { Button } from 'antd';
 
 interface FileBarProps {
-    fileName: string; // Nombre del archivo
+    fileName: string; 
     setFileName: React.Dispatch<React.SetStateAction<string>>;
-    fileContent: string; // Contenido del archivo
+    fileContent: string; 
     setFileContent: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent }) => {
-    const [selectedKey, setSelectedKey] = useState<string | null>(null);
-    const [newFileName, setNewFileName] = useState<string>(fileName); // Estado para el nuevo nombre del archivo
+    const [ , setSelectedKey] = useState<string>(''); 
+    const [newFileName, setNewFileName] = useState<string>(fileName); 
 
     const handleOpen = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setFileContent(e.target?.result as string); // Establecer el contenido del archivo
-                setFileName(file.name); // Establecer el nombre del archivo
-                message.info(`Archivo abierto: ${file.name}`); // Mensaje de confirmación
+                setFileContent(e.target?.result as string);
+                setFileName(file.name); 
+                message.info(`Archivo abierto: ${file.name}`); 
             };
-            reader.readAsText(file); // Leer el archivo como texto
+            reader.readAsText(file); 
         }
     };
 
     const handleSave = () => {
         if (!fileName) {
-            message.error('No hay un archivo para guardar.'); // Mensaje de error si no hay archivo
+            message.error('No hay un archivo para guardar.'); 
             return;
         }
         const blob = new Blob([fileContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName; // Usar el nombre del archivo
+        a.download = fileName; 
         a.click();
         URL.revokeObjectURL(url);
-        message.info(`Archivo guardado: ${fileName}`); // Mensaje de confirmación
+        message.info(`Archivo guardado: ${fileName}`); 
     };
 
     const handleSaveAs = () => {
-        // Mostrar un modal para que el usuario ingrese un nuevo nombre de archivo
+        
         Modal.confirm({
             title: 'Guardar como',
             content: (
@@ -57,12 +57,18 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = newFileName || 'archivo.txt'; // Usar el nuevo nombre del archivo
-                a.click();
+                a.download = newFileName || 'archivo.txt'; 
                 URL.revokeObjectURL(url);
-                message.info(`Archivo guardado como: ${newFileName || 'archivo.txt'}`); // Mensaje de confirmación
+                message.info(`Archivo guardado como: ${newFileName || 'archivo.txt'}`); // 
             },
         });
+    };
+
+    const handleCreateFile = () => {
+        setFileContent('');
+        setFileName('nuevo_archivo.txt'); 
+        setNewFileName('nuevo_archivo.txt');
+        message.info('Nuevo archivo creado.'); 
     };
 
     const handleMenuClick = (key: string) => {
@@ -73,11 +79,14 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
             handleSave();
         } else if (key === 'saveAs') {
             handleSaveAs();
+        } else if (key === 'create') {
+            handleCreateFile();
         }
     };
 
     const menu = (
         <Menu selectedKeys={[]} onClick={({ key }) => handleMenuClick(key)}>
+            <Menu.Item key="create">Crear archivo</Menu.Item>
             <Menu.Item key="open">
                 <input type="file" onChange={handleOpen} style={{ display: 'none' }} id="fileInput" />
                 <label htmlFor="fileInput" style={{ cursor: 'pointer' }}>Abrir</label>
