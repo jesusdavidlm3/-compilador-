@@ -29,17 +29,17 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
 
     const handleSave = () => {
         if (!fileName) {
-            message.error('No hay un archivo para guardar.'); // Mensaje de error si no hay archivo
-            return;
+            handleSaveAs()
+        }else{
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName; // Usar el nombre del archivo
+            a.click();
+            URL.revokeObjectURL(url);
+            message.info(`Archivo guardado: ${fileName}`); // Mensaje de confirmación
         }
-        const blob = new Blob([fileContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName; // Usar el nombre del archivo
-        a.click();
-        URL.revokeObjectURL(url);
-        message.info(`Archivo guardado: ${fileName}`); // Mensaje de confirmación
     };
 
     const handleSaveAs = () => {
@@ -49,18 +49,21 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
             content: (
                 <Input
                     defaultValue={fileName}
-                    onChange={(e) => setNewFileName(e.target.value)}
+                    id='newNameField'
+                    // onChange={(e) => setNewFileName(e.target.value)}  Esto lo hace mas lento, actualiza con cada letra
                 />
             ),
             onOk: () => {
+                const newNameField = document.getElementById("newNameField").value
                 const blob = new Blob([fileContent], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = newFileName || 'archivo.txt'; // Usar el nuevo nombre del archivo
+                a.download = newNameField || 'archivo.txt'; // Usar el nuevo nombre del archivo
                 a.click();
                 URL.revokeObjectURL(url);
-                message.info(`Archivo guardado como: ${newFileName || 'archivo.txt'}`); // Mensaje de confirmación
+                message.info(`Archivo guardado como: ${newNameField || 'archivo.txt'}`); // Mensaje de confirmación
+                setFileName(newNameField)
             },
         });
     };
@@ -92,7 +95,7 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
             <Dropdown overlay={menu} trigger={['click']}>
                 <Button type="primary" style={{ marginRight: '20px', marginLeft:'30px' }}>Archivo</Button>
             </Dropdown>
-            <span style={{ fontSize: '30px', marginLeft: '20px', flex: 1, textAlign: 'center' }}>
+            <span style={{ fontSize: '30px', marginLeft: '20px', flex: 1, textAlign: 'center', color: "white" }}>
                 {fileName || 'Sin nombre'}
             </span>
         </div>

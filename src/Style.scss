@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto:wght@100;400&display=swap');
+
 :root {
     --bgColor: #415a77;
     --moduleColor: #0d1b2a;
@@ -7,7 +9,7 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif; /* Puedes cambiar la fuente si lo deseas */
+    font-family: "Poppins", serif; /* Puedes cambiar la fuente si lo deseas */
 }
 
 .App {
