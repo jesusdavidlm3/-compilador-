@@ -1,7 +1,7 @@
 const FilePanel: React.FC = () => {
     return(
         <div className="FilePanel">
-
+        
         </div>
     )
 }

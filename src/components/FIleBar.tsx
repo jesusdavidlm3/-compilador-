@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Menu, message, Dropdown, Modal, Input } from 'antd';
 import { Button } from 'antd';
@@ -30,7 +29,7 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
     const handleSave = () => {
         if (!fileName) {
             handleSaveAs()
-        }else{
+        } else {
             const blob = new Blob([fileContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -43,14 +42,12 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
     };
 
     const handleSaveAs = () => {
-        
         Modal.confirm({
             title: 'Guardar como',
             content: (
                 <Input
                     defaultValue={fileName}
                     id='newNameField'
-                    // onChange={(e) => setNewFileName(e.target.value)}  Esto lo hace mas lento, actualiza con cada letra
                 />
             ),
             onOk: () => {
@@ -73,6 +70,12 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
         setFileName('nuevo_archivo.txt'); 
         setNewFileName('nuevo_archivo.txt');
         message.info('Nuevo archivo creado.'); 
+    };
+
+    const handleCompile = () => {
+        // Aquí puedes agregar la lógica para compilar el archivo
+        // Por ejemplo, podrías enviar el contenido del archivo a un servidor o ejecutar un script
+        message.info('Compilando...'); // Mensaje de confirmación     
     };
 
     const handleMenuClick = (key: string) => {
@@ -105,6 +108,7 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
             <Dropdown overlay={menu} trigger={['click']}>
                 <Button type="primary" style={{ marginRight: '20px', marginLeft:'30px' }}>Archivo</Button>
             </Dropdown>
+            <Button color="purple" variant="solid" onClick={handleCompile} style={{ marginRight: '20px' }}>Compilar</Button>
             <span style={{ fontSize: '30px', marginLeft: '20px', flex: 1, textAlign: 'center', color: "white" }}>
                 {fileName || 'Sin nombre'}
             </span>
