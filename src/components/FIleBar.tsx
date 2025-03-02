@@ -7,9 +7,10 @@ interface FileBarProps {
     setFileName: React.Dispatch<React.SetStateAction<string>>;
     fileContent: string; 
     setFileContent: React.Dispatch<React.SetStateAction<string>>;
+    openFile: (name: string, content: string) => void
 }
 
-const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent }) => {
+const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent, openFile }) => {
     const [ , setSelectedKey] = useState<string>(''); 
     const [newFileName, setNewFileName] = useState<string>(fileName); 
 
@@ -21,6 +22,7 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
                 setFileContent(e.target?.result as string);
                 setFileName(file.name); 
                 message.info(`Archivo abierto: ${file.name}`); 
+                openFile(file.name, e.target?.result as string)
             };
             reader.readAsText(file); 
         }
