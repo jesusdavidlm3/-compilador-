@@ -27,6 +27,17 @@ body {
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para un efecto de profundidad */
     }
     
+    .custom-primary {
+        background-color: purple !important; /* Cambia el color de fondo */
+        border-color: purple !important; /* Cambia el color del borde */
+        color: white; /* Cambia el color del texto si es necesario */
+    }
+    
+    .custom-primary:hover {
+        background-color: darkviolet !important; /* Color al pasar el mouse */
+        border-color: darkviolet !important; /* Color del borde al pasar el mouse */
+    }
+
     .ant-dropdown-link {
         color: white; /* Color del texto del menú */
         font-size: 18px; /* Tamaño de fuente del menú */

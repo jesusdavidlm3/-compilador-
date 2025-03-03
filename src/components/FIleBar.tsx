@@ -1,28 +1,30 @@
 import React, { useState } from 'react';
-import { Menu, message, Dropdown, Modal, Input } from 'antd';
-import { Button } from 'antd';
+import { Menu, message, Dropdown, Modal, Input, Button } from 'antd';
 
 interface FileBarProps {
     fileName: string; 
     setFileName: React.Dispatch<React.SetStateAction<string>>;
     fileContent: string; 
     setFileContent: React.Dispatch<React.SetStateAction<string>>;
-    openFile: (name: string, content: string) => void
+    openFile: (name: string, content: string) => void;
+    onFileContentChange: (content: string) => void; // Nueva prop
+    analyzeText: (text: string) => void; // Nueva prop para análisis
 }
 
-const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent, openFile }) => {
-    const [ , setSelectedKey] = useState<string>(''); 
-    const [newFileName, setNewFileName] = useState<string>(fileName); 
+const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, setFileContent, openFile, onFileContentChange, analyzeText }) => {
+    const [newFileName, setNewFileName] = useState <string>(fileName); 
 
     const handleOpen = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setFileContent(e.target?.result as string);
+                const content = e.target?.result as string;
+                setFileContent(content);
                 setFileName(file.name); 
                 message.info(`Archivo abierto: ${file.name}`); 
-                openFile(file.name, e.target?.result as string)
+                openFile(file.name, content);
+                onFileContentChange(content); 
             };
             reader.readAsText(file); 
         }
@@ -30,16 +32,16 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
 
     const handleSave = () => {
         if (!fileName) {
-            handleSaveAs()
+            handleSaveAs();
         } else {
             const blob = new Blob([fileContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = fileName; // Usar el nombre del archivo
+            a.download = fileName; 
             a.click();
             URL.revokeObjectURL(url);
-            message.info(`Archivo guardado: ${fileName}`); // Mensaje de confirmación
+            message.info(`Archivo guardado: ${fileName}`); 
         }
     };
 
@@ -53,16 +55,16 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
                 />
             ),
             onOk: () => {
-                const newNameField = document.getElementById("newNameField").value
+                const newNameField = document.getElementById("newNameField").value;
                 const blob = new Blob([fileContent], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = newNameField || 'archivo.txt'; // Usar el nuevo nombre del archivo
+                a.download = newNameField || 'archivo.txt'; 
                 a.click();
                 URL.revokeObjectURL(url);
-                message.info(`Archivo guardado como: ${newNameField || 'archivo.txt'}`); // Mensaje de confirmación
-                setFileName(newNameField)
+                message.info(`Archivo guardado como: ${newNameField || 'archivo.txt'}`);
+                setFileName(newNameField);
             },
         });
     };
@@ -75,13 +77,15 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
     };
 
     const handleCompile = () => {
-        // Aquí puedes agregar la lógica para compilar el archivo
-        // Por ejemplo, podrías enviar el contenido del archivo a un servidor o ejecutar un script
-        message.info('Compilando...'); // Mensaje de confirmación     
+        if (fileContent) {
+            analyzeText(fileContent); 
+            message.info('Compilando...', 1);
+        } else {
+            message.warning('No hay contenido para compilar.');
+        }
     };
 
     const handleMenuClick = (key: string) => {
-        setSelectedKey(key);
         if (key === 'open') {
             document.getElementById('fileInput')?.click();
         } else if (key === 'save') {
@@ -95,7 +99,7 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
 
     const menu = (
         <Menu selectedKeys={[]} onClick={({ key }) => handleMenuClick(key)}>
-            <Menu.Item key="create">Crear archivo</Menu.Item>
+            <Menu.Item key="create ">Crear archivo</Menu.Item>
             <Menu.Item key="open">
                 <input type="file" onChange={handleOpen} style={{ display: 'none' }} id="fileInput" />
                 <label htmlFor="fileInput" style={{ cursor: 'pointer' }}>Abrir</label>
@@ -110,7 +114,14 @@ const FileBar: React.FC<FileBarProps> = ({ fileName, setFileName, fileContent, s
             <Dropdown overlay={menu} trigger={['click']}>
                 <Button type="primary" style={{ marginRight: '20px', marginLeft:'30px' }}>Archivo</Button>
             </Dropdown>
-            <Button color="purple" variant="solid" onClick={handleCompile} style={{ marginRight: '20px' }}>Compilar</Button>
+            <Button
+                    className="custom-primary"
+                    type='primary'
+                    onClick={handleCompile}
+                    style={{ marginRight: '20px' }}
+                        >
+                    Compilar
+            </Button>
             <span style={{ fontSize: '30px', marginLeft: '20px', flex: 1, textAlign: 'center', color: "white" }}>
                 {fileName || 'Sin nombre'}
             </span>
