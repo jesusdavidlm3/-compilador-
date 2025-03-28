@@ -3,6 +3,7 @@ import FileBar from "./components/FIleBar";
 import FilePanel from "./components/FilesPanel";
 import CodeArea from "./components/CodeArea";
 import AnalizadorLexico from './compiler/AnalizadorLexico';
+import AnalizadorSintactico from './compiler/AnalizadorSintactico';
 
 interface filelist {
     name: string,
@@ -13,7 +14,8 @@ const App: React.FC = () => {
     const [files, setFiles] = useState<filelist[]>([]); 
     const [fileName, setFileName] = useState<string>(''); 
     const [fileContent, setFileContent] = useState<string>(''); 
-    const analizadorRef = useRef<{ analyze: (text: string) => void }>(null);
+    const analizadorLexicoRef = useRef<{ analyze: (text: string) => void }>(null);
+    const analizadorSintacticoRef = useRef<{ analyze: (text: string) => void }>(null);
 
     const openFile = (name: string, content: string): void => {
         setFiles([...files, { name: name, content: content }]);
@@ -36,8 +38,13 @@ const App: React.FC = () => {
     }
 
     const analyzeText = (text: string) => {
-        if (analizadorRef.current) {
-            analizadorRef.current.analyze(text);
+        // Llamar al analizador léxico
+        if (analizadorLexicoRef.current) {
+            analizadorLexicoRef.current.analyze(text);
+        }
+        // Llamar al analizador sintáctico
+        if (analizadorSintacticoRef.current) {
+            analizadorSintacticoRef.current.analyze(text);
         }
     }
 
@@ -62,7 +69,8 @@ const App: React.FC = () => {
                     fileContent={fileContent} 
                     setFileContent={setFileContent} 
                 />
-                <AnalizadorLexico ref={analizadorRef} />
+                <AnalizadorLexico ref={analizadorLexicoRef} />
+                <AnalizadorSintactico ref={analizadorSintacticoRef} /> 
             </div>
         </div>
     );
