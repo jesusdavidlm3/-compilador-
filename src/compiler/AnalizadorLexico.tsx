@@ -69,7 +69,7 @@ const AnalizadorLexico = forwardRef<AnalizadorLexicoRef, {}>((props, ref) => {
         Modal.info({
             title: 'Análisis Léxico',
             content: content,
-            width: 800, 
+            width: 800,
             onOk() {}, 
         });
     };

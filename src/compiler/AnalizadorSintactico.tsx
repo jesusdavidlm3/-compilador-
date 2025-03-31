@@ -39,7 +39,7 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
     };
 
     const tokenize = (text: string): string[] => {
-        // Tokenización simple: separar por espacios y caracteres especiales
+
         return text.match(/\S+/g) || [];
     };
 
@@ -55,7 +55,7 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
                 const right = parseTerm();
                 if (!right) {
                     errors.push(`Error de sintaxis: se esperaba un término después de '${operator}'`);
-                    return left; // Continúa con el análisis
+                    return left; 
                 }
                 left = { type: 'BinaryExpression', operator, left, right };
             }
@@ -71,7 +71,7 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
                 const right = parseFactor();
                 if (!right) {
                     errors.push(`Error de sintaxis: se esperaba un factor después de '${operator}'`);
-                    return left; // Continúa con el análisis
+                    return left; 
                 }
                 left = { type: 'BinaryExpression', operator, left, right };
             }
@@ -89,11 +89,11 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
                     return expression;
                 } else {
                     errors.push(`Error de sintaxis: se esperaba ')'`);
-                    return null; // Continúa con el análisis
+                    return null;
                 }
             }
             errors.push(`Error de sintaxis: se esperaba un número o '(' pero se encontró '${tokens[index] || 'fin de entrada'}'`);
-            return null; // Continúa con el análisis
+            return null; 
         };
 
         const parseTree = parseExpression();
