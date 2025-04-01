@@ -122,6 +122,6 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
 export default AnalizadorSintactico;
 
 // con eso lo probe deberia dar
-//x + 5 * ( x - 3 ) + 2 / 4 * ( 5 - 6 ) if ( x > 5 ) { return x; } else { return y; }
+//x + 5 * ( x - 3 ) + 2 / 4 * ( 5 - 6 ) if ( x > 5 ) 
 // x + 5 * ( yolo - 3 ) + 2 / 4 * ( 5 - 6 )
 
