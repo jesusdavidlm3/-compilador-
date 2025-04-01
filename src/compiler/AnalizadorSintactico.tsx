@@ -5,13 +5,15 @@ interface AnalizadorSintacticoRef {
     analyze: (text: string) => void; 
 }
 
+const reservedWords = new Set(['if', 'else', 'while', 'return', 'function', 'var', 'let', 'const']);
+
 const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) => {
     const analyzeText = (text: string) => {
         const tokens = tokenize(text);
         const errors: string[] = [];
         const parseTree = parse(tokens, errors);
 
-        const content = (
+        const content = ( 
             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                 {errors.length > 0 ? (
                     <>
@@ -39,8 +41,8 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
     };
 
     const tokenize = (text: string): string[] => {
-
-        return text.match(/\S+/g) || [];
+        // Tokenización mejorada para manejar correctamente los paréntesis
+        return text.match(/(\S+|\(|\))/g) || [];
     };
 
     const parse = (tokens: string[], errors: string[]): any => {
@@ -81,18 +83,25 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
         const parseFactor = (): any => {
             if (index < tokens.length && /^\d+$/.test(tokens[index])) {
                 return { type: 'Literal', value: parseInt(tokens[index++], 10) };
+            } else if (index < tokens.length && /^[a-zA-Z_]\w*$/.test(tokens[index])) {
+                const identifier = tokens[index++];
+                if (reservedWords.has(identifier)) {
+                    errors.push(`Error de sintaxis: '${identifier}' es una palabra reservada y no puede ser utilizada como identificador.`);
+                    return null; // Retornar null si es una palabra reservada
+                }
+                return { type: 'Identifier', name: identifier };
             } else if (index < tokens.length && tokens[index] === '(') {
-                index++; // consumir '('
+                index++; 
                 const expression = parseExpression();
                 if (index < tokens.length && tokens[index] === ')') {
-                    index++; // consumir ')'
+                    index++; 
                     return expression;
                 } else {
                     errors.push(`Error de sintaxis: se esperaba ')'`);
                     return null;
                 }
             }
-            errors.push(`Error de sintaxis: se esperaba un número o '(' pero se encontró '${tokens[index] || 'fin de entrada'}'`);
+            errors.push(`Error de sintaxis: se esperaba un número, un identificador o '(' pero se encontró '${tokens[index] || 'fin de entrada'}'`);
             return null; 
         };
 
@@ -112,75 +121,7 @@ const AnalizadorSintactico = forwardRef<AnalizadorSintacticoRef>((props, ref) =>
 
 export default AnalizadorSintactico;
 
-
 // con eso lo probe deberia dar
-//3 + 5 - 2 * ( 7 / 1 ) holiwi 
+//x + 5 * ( x - 3 ) + 2 / 4 * ( 5 - 6 ) if ( x > 5 ) { return x; } else { return y; }
+// x + 5 * ( yolo - 3 ) + 2 / 4 * ( 5 - 6 )
 
-/*
-Análisis Sintáctico
-Errores Sintácticos:
-
-Error de sintaxis: se encontró un token inesperado 'holiwi'
-Árbol de Análisis:
-
-{
-    "type": "BinaryExpression",
-    "operator": "-",
-    "left": {
-        "type": "BinaryExpression",
-        "operator": "+",
-        "left": {
-        "type": "Literal",
-        "value": 3
-        },
-        "right": {
-        "type": "Literal",
-        "value": 5
-        }
-    },
-    "right": {
-        "type": "BinaryExpression",
-        "operator": "*",
-        "left": {
-        "type": "Literal",
-        "value": 2
-        },
-        "right": {
-        "type": "BinaryExpression",
-        "operator": "/",
-        "left": {
-            "type": "Literal",
-            "value": 7
-        },
-        "right": {
-            "type": "Literal",
-            "value": 1
-        }
-        }
-    }
-    }
-  */
-
-    /*      
-            Análisis Léxico
-        Total de palabras: 1
-
-        holiwi
-
-        Total de números: 5
-
-        3
-        5
-        2
-        7
-        1
-        Total de caracteres especiales: 6
-
-        +
-        -
-        *
-        (
-        /
-        )
-        Total de caracteres inválidos: 0
-            */
